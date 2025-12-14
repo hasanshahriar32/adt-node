@@ -1,0 +1,5 @@
+simulation/.env
+simulation/flows_runtime.json
+simulation/flows_runtime_cred.json
+simulation/flows_cred.json
+simulation/node_modules/

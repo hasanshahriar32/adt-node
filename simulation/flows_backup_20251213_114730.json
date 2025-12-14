@@ -1,0 +1,159 @@
+[
+    {
+        "id": "f6f2187d.f17ca8",
+        "type": "tab",
+        "label": "PC Simulation",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "3cc11d24.ff01a2",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Tick 5s",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 120,
+        "wires": [
+            [
+                "d5a34b2.123456"
+            ]
+        ]
+    },
+    {
+        "id": "d5a34b2.123456",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Simulate Sensors",
+        "func": "let temp = flow.get('temp') || 28;\nlet hum = flow.get('hum') || 70;\nlet soil = flow.get('soil') || 30;\n\n// smooth variation\ntemp += (Math.random() - 0.5);\nhum += (Math.random() - 0.5) * 2;\nsoil += (Math.random() - 0.5) * 1.5;\n\n// clamp values\ntemp = Math.min(40, Math.max(18, temp));\nhum = Math.min(95, Math.max(50, hum));\nsoil = Math.min(60, Math.max(10, soil));\n\nflow.set('temp', temp);\nflow.set('hum', hum);\nflow.set('soil', soil);\n\nmsg.payload = {\n  temperature: Number(temp.toFixed(2)),\n  humidity: Number(hum.toFixed(2)),\n  soil_moisture: Number(soil.toFixed(2))\n};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 120,
+        "wires": [
+            [
+                "e7b89c3.654321",
+                "debug_raw"
+            ]
+        ]
+    },
+    {
+        "id": "e7b89c3.654321",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Format Payload",
+        "func": "let seq = flow.get(\"seq\") || 0;\nseq++;\nflow.set(\"seq\", seq);\n\nmsg.payload = {\n  schemaVersion: \"1.0\",\n  eventType: \"telemetry\",\n  dataClass: \"telemetry\",\n  messageId: seq,\n  deviceId: \"pc_sim_01\",\n  farmId: \"farm_001\",\n  zoneId: \"zone_A\",\n  telemetry: {\n    temperature: msg.payload.temperature,\n    humidity: msg.payload.humidity,\n    soilMoisture: msg.payload.soil_moisture\n  },\n  actuators: {\n    pump: \"OFF\"\n  },\n  system: {\n    deviceType: \"simulator\",\n    firmware: \"v0.1\",\n    status: \"online\",\n    timeSource: \"system\"\n  },\n  timestamp: new Date().toISOString()\n};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 580,
+        "y": 120,
+        "wires": [
+            [
+                "debug_final"
+            ]
+        ]
+    },
+    {
+        "id": "inject_heartbeat",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Heartbeat 60s",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "60",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 240,
+        "wires": [
+            [
+                "func_heartbeat"
+            ]
+        ]
+    },
+    {
+        "id": "func_heartbeat",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Format Heartbeat",
+        "func": "msg.payload = {\n  eventType: \"heartbeat\",\n  deviceId: \"pc_sim_01\",\n  status: \"online\",\n  timestamp: new Date().toISOString()\n};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 240,
+        "wires": [
+            [
+                "debug_final"
+            ]
+        ]
+    },
+    {
+        "id": "debug_raw",
+        "type": "debug",
+        "z": "f6f2187d.f17ca8",
+        "name": "Raw Values",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 570,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "debug_final",
+        "type": "debug",
+        "z": "f6f2187d.f17ca8",
+        "name": "IoT Hub Payload",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 800,
+        "y": 120,
+        "wires": []
+    }
+]

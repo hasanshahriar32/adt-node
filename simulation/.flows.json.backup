@@ -1,0 +1,279 @@
+[
+    {
+        "id": "f6f2187d.f17ca8",
+        "type": "tab",
+        "label": "Weather-Driven Simulation",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "tls_config",
+        "type": "tls-config",
+        "name": "Azure TLS",
+        "cert": "",
+        "key": "",
+        "ca": "",
+        "certname": "",
+        "keyname": "",
+        "caname": "",
+        "servername": "",
+        "verifyservercert": true,
+        "alpnprotocol": ""
+    },
+    {
+        "id": "mqtt_broker_config",
+        "type": "mqtt-broker",
+        "name": "Azure IoT Hub Broker",
+        "broker": "PLACEHOLDER_IOT_HUB_NAME.azure-devices.net",
+        "port": "8883",
+        "tls": "tls_config",
+        "clientid": "pc_sim_01",
+        "autoConnect": true,
+        "usetls": true,
+        "compatmode": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "weather_inject",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Fetch Weather (5 min)",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "300",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 160,
+        "y": 120,
+        "wires": [
+            [
+                "weather_http"
+            ]
+        ]
+    },
+    {
+        "id": "weather_http",
+        "type": "http request",
+        "z": "f6f2187d.f17ca8",
+        "name": "WeatherAPI.com",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "http://api.weatherapi.com/v1/current.json?key=f4a577a521884482a9462037251312&q=Dhaka",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 380,
+        "y": 120,
+        "wires": [
+            [
+                "weather_parser",
+                "debug_weather_raw"
+            ]
+        ]
+    },
+    {
+        "id": "weather_parser",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Parse Weather Data",
+        "func": "const w = msg.payload;\n\n// Check for valid API response\nif (!w || !w.current) {\n    node.warn(\"Weather API failed or key missing. Using fallback data.\");\n    // Fallback data (Dhaka averages)\n    msg.payload = {\n        externalWeather: {\n            temperature: 30,\n            humidity: 70,\n            rainfall: 0,\n            windSpeed: 5,\n            cloudCover: 20,\n            isFallback: true\n        }\n    };\n} else {\n    msg.payload = {\n        externalWeather: {\n            temperature: w.current.temp_c,\n            humidity: w.current.humidity,\n            rainfall: w.current.precip_mm,\n            windSpeed: w.current.wind_kph,\n            cloudCover: w.current.cloud,\n            isFallback: false\n        }\n    };\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 620,
+        "y": 120,
+        "wires": [
+            [
+                "soil_fusion"
+            ]
+        ]
+    },
+    {
+        "id": "soil_fusion",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Soil Fusion (Physics-Based)",
+        "func": "let soil = flow.get(\"soil\") || 35;\nconst weather = msg.payload.externalWeather;\n\n// rainfall increases soil moisture\nsoil += weather.rainfall * 2;\n\n// temperature decreases moisture (evaporation)\nsoil -= weather.temperature * 0.05;\n\n// clamp\nsoil = Math.min(60, Math.max(10, soil));\nflow.set(\"soil\", soil);\n\nmsg.payload = {\n  temperature: weather.temperature,\n  humidity: weather.humidity,\n  soil_moisture: Number(soil.toFixed(2)),\n  weatherSource: \"WeatherAPI.com\"\n};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 870,
+        "y": 120,
+        "wires": [
+            [
+                "format_payload",
+                "debug_fused"
+            ]
+        ]
+    },
+    {
+        "id": "format_payload",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Format Payload",
+        "func": "let seq = flow.get(\"seq\") || 0;\nseq++;\nflow.set(\"seq\", seq);\n\nmsg.payload = {\n  schemaVersion: \"1.0\",\n  eventType: \"telemetry\",\n  dataClass: \"telemetry\",\n  messageId: seq,\n  deviceId: \"pc_sim_01\",\n  farmId: \"farm_001\",\n  zoneId: \"zone_A\",\n  telemetry: {\n    temperature: msg.payload.temperature,\n    humidity: msg.payload.humidity,\n    soilMoisture: msg.payload.soil_moisture\n  },\n  actuators: {\n    pump: \"OFF\"\n  },\n  system: {\n    deviceType: \"simulator\",\n    firmware: \"v0.1\",\n    status: \"online\",\n    timeSource: \"system\",\n    dataSource: msg.payload.weatherSource\n  },\n  timestamp: new Date().toISOString()\n};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 130,
+        "y": 200,
+        "wires": [
+            [
+                "debug_final",
+                "mqtt_out_node"
+            ]
+        ]
+    },
+    {
+        "id": "inject_heartbeat",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Heartbeat 60s",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "60",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 400,
+        "wires": [
+            [
+                "func_heartbeat"
+            ]
+        ]
+    },
+    {
+        "id": "func_heartbeat",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Format Heartbeat",
+        "func": "msg.payload = {\n  eventType: \"heartbeat\",\n  deviceId: \"pc_sim_01\",\n  status: \"online\",\n  timestamp: new Date().toISOString()\n};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 380,
+        "wires": [
+            [
+                "debug_final",
+                "mqtt_out_node"
+            ]
+        ]
+    },
+    {
+        "id": "debug_weather_raw",
+        "type": "debug",
+        "z": "f6f2187d.f17ca8",
+        "name": "Raw Weather API",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 620,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "debug_fused",
+        "type": "debug",
+        "z": "f6f2187d.f17ca8",
+        "name": "Fused Data",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 870,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "debug_final",
+        "type": "debug",
+        "z": "f6f2187d.f17ca8",
+        "name": "IoT Hub Payload",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 530,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "mqtt_out_node",
+        "type": "mqtt out",
+        "z": "f6f2187d.f17ca8",
+        "name": "Azure IoT Hub",
+        "topic": "devices/pc_sim_01/messages/events/",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "application/json",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "mqtt_broker_config",
+        "x": 320,
+        "y": 260,
+        "wires": []
+    }
+]

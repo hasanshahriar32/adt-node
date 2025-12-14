@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: adt-simulation
+    env: docker
+    plan: free
+    dockerContext: simulation
+    dockerfilePath: simulation/Dockerfile
+    envVars:
+      - key: PORT
+        value: 1880
+      - key: WEATHER_API_KEY
+        sync: false
+      - key: WEATHER_LOCATION
+        value: Dhaka
+      - key: IOT_HUB_HOSTNAME
+        sync: false
+      - key: DEVICE_ID
+        value: pc_sim_01
+      - key: IOT_HUB_SAS_KEY
+        sync: false

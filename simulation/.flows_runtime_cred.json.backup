@@ -1,0 +1,6 @@
+{
+    "mqtt_broker_config": {
+        "user": "researchdt.azure-devices.net/pc_sim_01/?api-version=2021-04-12",
+        "password": "SharedAccessSignature sr=researchdt.azure-devices.net%2Fdevices%2Fpc_sim_01&sig=r%2Bc2sj4sjfajpl61rnqSGMDtfaseDpNIOXA7WQ9KJIU%3D&se=1797282602"
+    }
+}
