@@ -7,7 +7,7 @@ services:
     dockerfilePath: simulation/Dockerfile
     envVars:
       - key: PORT
-        value: 1880
+        value: 10000
       - key: WEATHER_API_KEY
         sync: false
       - key: WEATHER_LOCATION

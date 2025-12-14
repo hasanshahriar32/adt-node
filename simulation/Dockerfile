@@ -18,8 +18,8 @@ COPY . .
 RUN chmod +x start_simulation.sh
 
 # Environment variables
-ENV PORT=1880
-EXPOSE 1880
+ENV PORT=10000
+EXPOSE 10000
 
 # Start command
 CMD ["./start_simulation.sh"]
