@@ -1,0 +1,44 @@
+{
+  "@context": "dtmi:dtdl:context;2",
+  "@id": "dtmi:agriculture:Farm;1",
+  "@type": "Interface",
+  "displayName": "Farm",
+  "description": "Represents an agricultural farm",
+  "contents": [
+    {
+      "@type": "Property",
+      "name": "name",
+      "schema": "string",
+      "displayName": "Farm Name",
+      "description": "Name of the farm"
+    },
+    {
+      "@type": "Property",
+      "name": "location",
+      "schema": "string",
+      "displayName": "Location",
+      "description": "Geographic location of the farm"
+    },
+    {
+      "@type": "Property",
+      "name": "totalArea",
+      "schema": "double",
+      "displayName": "Total Area",
+      "description": "Total area in hectares"
+    },
+    {
+      "@type": "Property",
+      "name": "owner",
+      "schema": "string",
+      "displayName": "Owner",
+      "description": "Farm owner name"
+    },
+    {
+      "@type": "Relationship",
+      "name": "hasZone",
+      "target": "dtmi:agriculture:Zone;1",
+      "displayName": "Has Zone",
+      "description": "Farm contains multiple zones"
+    }
+  ]
+}

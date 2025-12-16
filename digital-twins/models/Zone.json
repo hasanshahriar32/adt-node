@@ -1,0 +1,93 @@
+{
+  "@context": "dtmi:dtdl:context;2",
+  "@id": "dtmi:agriculture:Zone;1",
+  "@type": "Interface",
+  "displayName": "Zone",
+  "description": "Represents a cultivation zone within a farm",
+  "contents": [
+    {
+      "@type": "Property",
+      "name": "name",
+      "schema": "string",
+      "displayName": "Zone Name",
+      "description": "Name/identifier of the zone"
+    },
+    {
+      "@type": "Property",
+      "name": "area",
+      "schema": "double",
+      "displayName": "Area",
+      "description": "Zone area in hectares"
+    },
+    {
+      "@type": "Property",
+      "name": "soilType",
+      "schema": "string",
+      "displayName": "Soil Type",
+      "description": "Type of soil in the zone"
+    },
+    {
+      "@type": "Property",
+      "name": "currentCrop",
+      "schema": "string",
+      "displayName": "Current Crop",
+      "description": "Currently cultivated crop"
+    },
+    {
+      "@type": "Property",
+      "name": "recommendedCrop",
+      "schema": "string",
+      "displayName": "Recommended Crop",
+      "description": "AI-recommended crop"
+    },
+    {
+      "@type": "Property",
+      "name": "recommendationConfidence",
+      "schema": "double",
+      "displayName": "Recommendation Confidence",
+      "description": "Confidence score of the recommendation (0-1)"
+    },
+    {
+      "@type": "Property",
+      "name": "lastUpdated",
+      "schema": "dateTime",
+      "displayName": "Last Updated",
+      "description": "Timestamp of last update"
+    },
+    {
+      "@type": "Telemetry",
+      "name": "temperature",
+      "schema": "double",
+      "displayName": "Temperature",
+      "description": "Current temperature in Celsius"
+    },
+    {
+      "@type": "Telemetry",
+      "name": "humidity",
+      "schema": "double",
+      "displayName": "Humidity",
+      "description": "Current humidity percentage"
+    },
+    {
+      "@type": "Telemetry",
+      "name": "soilMoisture",
+      "schema": "double",
+      "displayName": "Soil Moisture",
+      "description": "Current soil moisture percentage"
+    },
+    {
+      "@type": "Relationship",
+      "name": "hasDevice",
+      "target": "dtmi:agriculture:Device;1",
+      "displayName": "Has Device",
+      "description": "Zone contains IoT devices"
+    },
+    {
+      "@type": "Relationship",
+      "name": "growsCrop",
+      "target": "dtmi:agriculture:Crop;1",
+      "displayName": "Grows Crop",
+      "description": "Current crop being grown"
+    }
+  ]
+}

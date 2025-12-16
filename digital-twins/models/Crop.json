@@ -1,0 +1,79 @@
+{
+  "@context": "dtmi:dtdl:context;2",
+  "@id": "dtmi:agriculture:Crop;1",
+  "@type": "Interface",
+  "displayName": "Crop",
+  "description": "Represents a crop type and its requirements",
+  "contents": [
+    {
+      "@type": "Property",
+      "name": "name",
+      "schema": "string",
+      "displayName": "Crop Name",
+      "description": "Name of the crop"
+    },
+    {
+      "@type": "Property",
+      "name": "scientificName",
+      "schema": "string",
+      "displayName": "Scientific Name",
+      "description": "Scientific/botanical name"
+    },
+    {
+      "@type": "Property",
+      "name": "optimalTemperatureMin",
+      "schema": "double",
+      "displayName": "Optimal Temperature Min",
+      "description": "Minimum optimal temperature in Celsius"
+    },
+    {
+      "@type": "Property",
+      "name": "optimalTemperatureMax",
+      "schema": "double",
+      "displayName": "Optimal Temperature Max",
+      "description": "Maximum optimal temperature in Celsius"
+    },
+    {
+      "@type": "Property",
+      "name": "optimalHumidityMin",
+      "schema": "double",
+      "displayName": "Optimal Humidity Min",
+      "description": "Minimum optimal humidity percentage"
+    },
+    {
+      "@type": "Property",
+      "name": "optimalHumidityMax",
+      "schema": "double",
+      "displayName": "Optimal Humidity Max",
+      "description": "Maximum optimal humidity percentage"
+    },
+    {
+      "@type": "Property",
+      "name": "optimalSoilMoistureMin",
+      "schema": "double",
+      "displayName": "Optimal Soil Moisture Min",
+      "description": "Minimum optimal soil moisture percentage"
+    },
+    {
+      "@type": "Property",
+      "name": "optimalSoilMoistureMax",
+      "schema": "double",
+      "displayName": "Optimal Soil Moisture Max",
+      "description": "Maximum optimal soil moisture percentage"
+    },
+    {
+      "@type": "Property",
+      "name": "growthDuration",
+      "schema": "integer",
+      "displayName": "Growth Duration",
+      "description": "Growth duration in days"
+    },
+    {
+      "@type": "Property",
+      "name": "season",
+      "schema": "string",
+      "displayName": "Growing Season",
+      "description": "Optimal growing season"
+    }
+  ]
+}

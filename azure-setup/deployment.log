@@ -1,0 +1,7 @@
+==========================================
+Azure Digital Twins Setup
+==========================================
+
+Checking Azure CLI login status...
+❌ Not logged in to Azure CLI
+Please run: ./az-docker.sh login

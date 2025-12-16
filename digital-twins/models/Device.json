@@ -1,0 +1,72 @@
+{
+  "@context": "dtmi:dtdl:context;2",
+  "@id": "dtmi:agriculture:Device;1",
+  "@type": "Interface",
+  "displayName": "IoT Device",
+  "description": "Represents an IoT sensor device",
+  "contents": [
+    {
+      "@type": "Property",
+      "name": "deviceId",
+      "schema": "string",
+      "displayName": "Device ID",
+      "description": "Unique device identifier"
+    },
+    {
+      "@type": "Property",
+      "name": "deviceType",
+      "schema": "string",
+      "displayName": "Device Type",
+      "description": "Type of device (simulator, raspberry-pi, etc.)"
+    },
+    {
+      "@type": "Property",
+      "name": "firmwareVersion",
+      "schema": "string",
+      "displayName": "Firmware Version",
+      "description": "Current firmware version"
+    },
+    {
+      "@type": "Property",
+      "name": "status",
+      "schema": "string",
+      "displayName": "Status",
+      "description": "Device status (online, offline, error)"
+    },
+    {
+      "@type": "Property",
+      "name": "lastSeen",
+      "schema": "dateTime",
+      "displayName": "Last Seen",
+      "description": "Last communication timestamp"
+    },
+    {
+      "@type": "Telemetry",
+      "name": "temperature",
+      "schema": "double",
+      "displayName": "Temperature",
+      "description": "Measured temperature in Celsius"
+    },
+    {
+      "@type": "Telemetry",
+      "name": "humidity",
+      "schema": "double",
+      "displayName": "Humidity",
+      "description": "Measured humidity percentage"
+    },
+    {
+      "@type": "Telemetry",
+      "name": "soilMoisture",
+      "schema": "double",
+      "displayName": "Soil Moisture",
+      "description": "Measured soil moisture percentage"
+    },
+    {
+      "@type": "Telemetry",
+      "name": "batteryLevel",
+      "schema": "double",
+      "displayName": "Battery Level",
+      "description": "Battery level percentage (if battery-powered)"
+    }
+  ]
+}
