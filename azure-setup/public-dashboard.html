@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farm Digital Twin - Live Monitor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-icon {
+            font-size: 2em;
+            margin-right: 15px;
+        }
+        
+        .card-title {
+            font-size: 1.3em;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .metric:last-child {
+            border-bottom: none;
+        }
+        
+        .metric-label {
+            color: #666;
+            font-size: 0.95em;
+        }
+        
+        .metric-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 1.2em;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .last-updated {
+            text-align: center;
+            color: white;
+            margin-top: 20px;
+            opacity: 0.9;
+        }
+        
+        .recommendation-card {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            color: white;
+        }
+        
+        .recommendation-card .card-title,
+        .recommendation-card .metric-label,
+        .recommendation-card .metric-value {
+            color: white;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        
+        .updating {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌾 Farm Digital Twin</h1>
+            <p class="subtitle">Real-Time Agricultural Monitoring System</p>
+        </header>
+        
+        <div id="loading" class="loading">
+            Loading data from Azure Digital Twins...
+        </div>
+        
+        <div id="error" class="error" style="display: none;">
+            Failed to load data. Please check the Azure Function endpoint.
+        </div>
+        
+        <div id="dashboard" class="dashboard" style="display: none;">
+            <!-- Farm Info Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">🏡</div>
+                    <div class="card-title">Farm Information</div>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Name</span>
+                    <span class="metric-value" id="farm-name">--</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Location</span>
+                    <span class="metric-value" id="farm-location">--</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Total Area</span>
+                    <span class="metric-value" id="farm-area">--</span>
+                </div>
+            </div>
+            
+            <!-- Zone Info Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">🗺️</div>
+                    <div class="card-title">Zone Details</div>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Zone Name</span>
+                    <span class="metric-value" id="zone-name">--</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Area</span>
+                    <span class="metric-value" id="zone-area">--</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Soil Type</span>
+                    <span class="metric-value" id="zone-soil">--</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Current Crop</span>
+                    <span class="metric-value" id="zone-crop">--</span>
+                </div>
+            </div>
+            
+            <!-- Sensor Data Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">📊</div>
+                    <div class="card-title">Live Sensor Data</div>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">🌡️ Temperature</span>
+                    <span class="metric-value updating" id="temperature">--</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">💧 Humidity</span>
+                    <span class="metric-value updating" id="humidity">--</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">🌱 Soil Moisture</span>
+                    <span class="metric-value updating" id="soil-moisture">--</span>
+                </div>
+            </div>
+            
+            <!-- AI Recommendation Card -->
+            <div class="card recommendation-card">
+                <div class="card-header">
+                    <div class="card-icon">🤖</div>
+                    <div class="card-title">AI Crop Recommendation</div>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Recommended Crop</span>
+                    <span class="metric-value" id="recommended-crop">--</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Confidence</span>
+                    <span class="metric-value" id="confidence">--</span>
+                </div>
+            </div>
+            
+            <!-- Device Status Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">📡</div>
+                    <div class="card-title">Device Status</div>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Device ID</span>
+                    <span class="metric-value" id="device-id">--</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Status</span>
+                    <span id="device-status">--</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Last Seen</span>
+                    <span class="metric-value" style="font-size: 1em;" id="device-last-seen">--</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="last-updated">
+            Last Updated: <span id="last-updated">Never</span> | 
+            Auto-refresh: <span id="countdown">5</span>s
+        </div>
+    </div>
+    
+    <script>
+        // ⚠️ REPLACE THIS WITH YOUR AZURE FUNCTION URL
+        const API_ENDPOINT = 'https://adt-telemetry-router.azurewebsites.net/api/getTwinData';
+        
+        let countdown = 5;
+        let countdownTimer;
+        
+        async function loadTwinData() {
+            try {
+                const response = await fetch(API_ENDPOINT);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Update Farm Info
+                document.getElementById('farm-name').textContent = data.farm.name;
+                document.getElementById('farm-location').textContent = data.farm.location;
+                document.getElementById('farm-area').textContent = data.farm.totalArea + ' ha';
+                
+                // Update Zone Info
+                document.getElementById('zone-name').textContent = data.zone.name;
+                document.getElementById('zone-area').textContent = data.zone.area + ' ha';
+                document.getElementById('zone-soil').textContent = data.zone.soilType;
+                document.getElementById('zone-crop').textContent = data.zone.currentCrop;
+                
+                // Update Sensor Data
+                document.getElementById('temperature').textContent = data.sensors.temperature.toFixed(1) + '°C';
+                document.getElementById('humidity').textContent = data.sensors.humidity.toFixed(1) + '%';
+                document.getElementById('soil-moisture').textContent = data.sensors.soilMoisture.toFixed(1) + '%';
+                
+                // Update AI Recommendation
+                document.getElementById('recommended-crop').textContent = data.zone.recommendedCrop;
+                document.getElementById('confidence').textContent = (data.zone.recommendationConfidence * 100).toFixed(0) + '%';
+                
+                // Update Device Status
+                document.getElementById('device-id').textContent = data.device.deviceId;
+                const statusBadge = document.getElementById('device-status');
+                statusBadge.textContent = data.device.status.toUpperCase();
+                statusBadge.className = 'status-badge ' + (data.device.status === 'active' ? 'status-active' : 'status-inactive');
+                
+                const lastSeen = new Date(data.device.lastSeen);
+                document.getElementById('device-last-seen').textContent = lastSeen.toLocaleString();
+                
+                // Update metadata
+                const lastUpdated = new Date(data.metadata.lastUpdated);
+                document.getElementById('last-updated').textContent = lastUpdated.toLocaleTimeString();
+                
+                // Hide loading, show dashboard
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'grid';
+                
+            } catch (error) {
+                console.error('Error loading twin data:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').textContent = 'Error: ' + error.message;
+            }
+        }
+        
+        function startCountdown() {
+            countdown = 5;
+            document.getElementById('countdown').textContent = countdown;
+            
+            countdownTimer = setInterval(() => {
+                countdown--;
+                document.getElementById('countdown').textContent = countdown;
+                
+                if (countdown <= 0) {
+                    loadTwinData();
+                    countdown = 5;
+                }
+            }, 1000);
+        }
+        
+        // Load data immediately and start auto-refresh
+        loadTwinData();
+        startCountdown();
+    </script>
+</body>
+</html>

@@ -36,7 +36,7 @@ echo ""
 
 # Create Storage Account for Azure Function
 echo "Creating storage account: $STORAGE_ACCOUNT_NAME"
-az storage account create \
+$AZ storage account create \
     --name $STORAGE_ACCOUNT_NAME \
     --resource-group $RESOURCE_GROUP \
     --location $LOCATION \

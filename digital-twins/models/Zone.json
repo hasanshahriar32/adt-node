@@ -55,25 +55,28 @@
       "description": "Timestamp of last update"
     },
     {
-      "@type": "Telemetry",
+      "@type": "Property",
       "name": "temperature",
       "schema": "double",
       "displayName": "Temperature",
-      "description": "Current temperature in Celsius"
+      "description": "Current temperature in Celsius",
+      "writable": true
     },
     {
-      "@type": "Telemetry",
+      "@type": "Property",
       "name": "humidity",
       "schema": "double",
       "displayName": "Humidity",
-      "description": "Current humidity percentage"
+      "description": "Current humidity percentage",
+      "writable": true
     },
     {
-      "@type": "Telemetry",
+      "@type": "Property",
       "name": "soilMoisture",
       "schema": "double",
       "displayName": "Soil Moisture",
-      "description": "Current soil moisture percentage"
+      "description": "Current soil moisture percentage",
+      "writable": true
     },
     {
       "@type": "Relationship",
