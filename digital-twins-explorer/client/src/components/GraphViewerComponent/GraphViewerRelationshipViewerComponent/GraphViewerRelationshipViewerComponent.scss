@@ -1,0 +1,56 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
+@import "../../../theme/theme.scss";
+
+.gc-relationship-view-modal {
+  h2 {
+    font-weight: 400;
+    margin-bottom: 10px;
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+
+    &:focus{
+      outline: 1px solid #fff;
+    }
+
+    i {
+      margin-right: 10px;
+      color: rgb(0, 120, 212);
+    }
+  }
+  .relationships {
+    box-sizing: border-box;
+    background-color: black;
+    padding: 0 14px;
+    overflow: auto;
+    max-height: 200px;
+    margin-bottom: 20px;
+
+    a {
+      color: lightgreen;
+      pointer-events: none;
+      text-decoration: none;
+    }
+
+    @media (forced-colors: active) {
+      &::-webkit-scrollbar-thumb {
+        border: 3px solid white;
+      }
+      border: 1px solid white;
+    }
+  }
+  .modal-button {
+    width: 100px;
+    margin-right: 10px;
+    color: white;
+    font-weight: 600;
+    border: none;
+    &.close-button {
+      float: right;
+      background: $buttonColor;
+      color: #000;
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json.schemastore.org/proxies",
+  "proxies": {
+    "web-index": {
+      "matchCondition": {
+        "methods": [ "GET", "HEAD" ],
+        "route": "/"
+      },
+      "backendUri": "https://%SITE_STORAGE_ACCOUNT_NAME%.blob.core.windows.net/%SITE_CONTAINER_NAME%/index.html?%SITE_CONTAINER_SAS%",
+      "responseOverrides": {
+        "response.headers.Content-Security-Policy": "default-src 'self' data: 'unsafe-inline' 'unsafe-eval'; connect-src 'self' https://*.service.signalr.net wss://*.service.signalr.net; font-src https://spoprod-a.akamaihd.net https://static2.sharepointonline.com; frame-ancestors 'none';" 
+      }
+    },
+    "web-static": {
+      "matchCondition": {
+        "methods": [ "GET", "HEAD" ],
+        "route": "static/{*restOfPath}"
+      },
+      "backendUri": "https://%SITE_STORAGE_ACCOUNT_NAME%.blob.core.windows.net/%SITE_CONTAINER_NAME%/static/{restOfPath}?%SITE_CONTAINER_SAS%"
+    },
+    "web-root": {
+      "matchCondition": {
+        "methods": [ "GET", "HEAD" ],
+        "route": "{file}.{ext}"
+      },
+      "backendUri": "https://%SITE_STORAGE_ACCOUNT_NAME%.blob.core.windows.net/%SITE_CONTAINER_NAME%/{file}.{ext}?%SITE_CONTAINER_SAS%"
+    }
+  }
+}
