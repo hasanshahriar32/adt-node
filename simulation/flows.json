@@ -179,7 +179,8 @@
             [
                 "debug_final",
                 "mqtt_out_node",
-                "prepare_dashboard_data"
+                "prepare_dashboard_data",
+                "save_latest_telemetry"
             ]
         ]
     },
@@ -374,5 +375,67 @@
         "wires": [
             ["ui_template_monitor"]
         ]
+    },
+    {
+        "id": "save_latest_telemetry",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Save Latest Telemetry",
+        "func": "global.set('latestTelemetry', msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 640,
+        "y": 300,
+        "wires": [[]]
+    },
+    {
+        "id": "http_in_telemetry",
+        "type": "http in",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "url": "/api/telemetry",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 170,
+        "y": 600,
+        "wires": [
+            [
+                "get_telemetry"
+            ]
+        ]
+    },
+    {
+        "id": "get_telemetry",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Get Latest Telemetry",
+        "func": "msg.payload = global.get('latestTelemetry') || { error: 'No data available yet' };\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 410,
+        "y": 600,
+        "wires": [
+            [
+                "http_response"
+            ]
+        ]
+    },
+    {
+        "id": "http_response",
+        "type": "http response",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 630,
+        "y": 600,
+        "wires": []
     }
 ]

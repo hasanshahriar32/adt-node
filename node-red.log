@@ -1,0 +1,17 @@
+17 Dec 18:01:31 - [info] 
+
+Welcome to Node-RED
+===================
+
+17 Dec 18:01:31 - [info] Node-RED version: v4.1.2
+17 Dec 18:01:31 - [info] Node.js  version: v25.2.1
+17 Dec 18:01:31 - [info] Linux 6.12.58-1-lts x64 LE
+17 Dec 18:01:31 - [info] Loading palette nodes
+17 Dec 18:01:32 - [info] Dashboard version 3.6.6 started at /ui
+17 Dec 18:01:32 - [info] Settings file  : /home/hs32/Documents/Projects/adt/simulation/settings.js
+17 Dec 18:01:32 - [info] Context store  : 'default' [module=memory]
+17 Dec 18:01:32 - [info] User directory : /home/hs32/Documents/Projects/adt/simulation
+17 Dec 18:01:32 - [warn] Projects disabled : editorTheme.projects.enabled=false
+17 Dec 18:01:32 - [info] Flows file     : /home/hs32/Documents/Projects/adt/simulation/flows.json
+17 Dec 18:01:32 - [error] Unable to listen on http://127.0.0.1:1880/
+17 Dec 18:01:32 - [error] Error: port in use
