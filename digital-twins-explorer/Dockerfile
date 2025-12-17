@@ -1,7 +1,7 @@
 FROM node:18-slim
 
-# Set environment variable to handle OpenSSL and package compatibility
-ENV NODE_OPTIONS=--openssl-legacy-provider
+# Set environment variable to handle OpenSSL and package compatibility, and increase heap size
+ENV NODE_OPTIONS="--openssl-legacy-provider --max-old-space-size=4096"
 
 # Install required dependencies
 RUN apt-get update
@@ -31,6 +31,6 @@ WORKDIR /usr/src/app/client/src
 EXPOSE 3000
 # Create startup script & start the app
 WORKDIR /usr/src/app/client/src
-RUN printf "#!/bin/sh\nset -e\naz login && npm run start" > startup.sh
+RUN printf "#!/bin/sh\nset -e\nexport DISABLE_ESLINT_PLUGIN=true\naz login && npm run start" > startup.sh
 RUN chmod 0755 startup.sh
 ENTRYPOINT ["./startup.sh"]
