@@ -245,7 +245,7 @@ def main():
     
     api_url = st.sidebar.text_input(
         "Simulation API Endpoint",
-        value="http://localhost:1880/api/telemetry",
+        value="https://adt-node.onrender.com/api/telemetry",
         help="Enter the URL of your Node-RED simulation API"
     )
     
@@ -255,12 +255,55 @@ def main():
     st.sidebar.markdown("---")
     st.sidebar.info("💡 Configure farm parameters in the expandable section below the dashboard.")
     
+    # Farm parameter inputs (outside the refresh loop to avoid duplicate keys)
+    # Get options from encoders
+    districts = list(encoders['District'].classes_) if 'District' in encoders else ['District_A']
+    seasons = list(encoders['Season'].classes_) if 'Season' in encoders else ['Kharif', 'Rabi']
+    
+    with st.expander("⚙️ Configure Farm Parameters", expanded=False):
+        st.subheader("Enter Farm Details")
+        
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.markdown("**Location & Season**")
+            district = st.selectbox("District", districts, key="district_input")
+            season = st.selectbox("Season", seasons, key="season_input")
+            area = st.number_input("Area (Ha)", min_value=0.1, value=1.0, step=0.1, key="area_input")
+            ap_ratio = st.number_input("AP Ratio", min_value=0.0, value=0.5, step=0.1, key="ap_ratio_input")
+        
+        with col2:
+            st.markdown("**Environmental**")
+            total_rainfall = st.number_input("Total Rainfall (mm)", min_value=0.0, value=800.0, step=10.0, key="rainfall_input")
+            ph_level = st.number_input("pH Level", min_value=0.0, max_value=14.0, value=6.5, step=0.1, key="ph_input")
+            max_temp = st.number_input("Max Temp (°C)", min_value=-10.0, max_value=50.0, value=35.0, step=0.5, key="max_temp_input")
+            min_temp = st.number_input("Min Temp (°C)", min_value=-10.0, max_value=50.0, value=20.0, step=0.5, key="min_temp_input")
+        
+        with col3:
+            st.markdown("**Production & Growth**")
+            production = st.number_input("Production", min_value=0.0, value=1000.0, step=100.0, key="production_input")
+            max_humidity = st.slider("Max Humidity (%)", 0, 100, 90, key="max_humidity_input")
+            min_humidity = st.slider("Min Humidity (%)", 0, 100, 50, key="min_humidity_input")
+        
+        st.markdown("**Crop Growth Stages (days)**")
+        gcol1, gcol2, gcol3 = st.columns(3)
+        with gcol1:
+            transplant = st.number_input("Transplant", min_value=0, value=30, step=1, key="transplant_input")
+        with gcol2:
+            growth = st.number_input("Growth", min_value=0, value=90, step=1, key="growth_input")
+        with gcol3:
+            harvest = st.number_input("Harvest", min_value=0, value=120, step=1, key="harvest_input")
+    
+    st.markdown("---")
+    
     # Main content area
     if auto_refresh:
         # Create placeholder for dynamic content
         placeholder = st.empty()
+        iteration = 0  # Counter for unique keys
         
         while True:
+            iteration += 1
             with placeholder.container():
                 # Fetch simulation data
                 data, fetch_error = fetch_simulation_data(api_url)
@@ -280,47 +323,6 @@ def main():
                         tel_cols[1].metric("💧 Humidity", f"{tel.get('humidity', 0):.1f} %")
                         tel_cols[2].metric("🌱 Soil Moisture", f"{tel.get('soilMoisture', 0):.1f} %")
                         tel_cols[3].metric("⏰ Last Update", datetime.now().strftime("%H:%M:%S"))
-                    
-                    st.markdown("---")
-                    
-                    # Farm parameter inputs (collapsible)
-                    with st.expander("⚙️ Configure Farm Parameters", expanded=False):
-                        st.subheader("Enter Farm Details")
-                        
-                        # Get options from encoders
-                        districts = list(encoders['District'].classes_) if 'District' in encoders else ['District_A']
-                        seasons = list(encoders['Season'].classes_) if 'Season' in encoders else ['Kharif', 'Rabi']
-                        
-                        col1, col2, col3 = st.columns(3)
-                        
-                        with col1:
-                            st.markdown("**Location & Season**")
-                            district = st.selectbox("District", districts, key="district_input")
-                            season = st.selectbox("Season", seasons, key="season_input")
-                            area = st.number_input("Area (Ha)", min_value=0.1, value=1.0, step=0.1, key="area_input")
-                            ap_ratio = st.number_input("AP Ratio", min_value=0.0, value=0.5, step=0.1, key="ap_ratio_input")
-                        
-                        with col2:
-                            st.markdown("**Environmental**")
-                            total_rainfall = st.number_input("Total Rainfall (mm)", min_value=0.0, value=800.0, step=10.0, key="rainfall_input")
-                            ph_level = st.number_input("pH Level", min_value=0.0, max_value=14.0, value=6.5, step=0.1, key="ph_input")
-                            max_temp = st.number_input("Max Temp (°C)", min_value=-10.0, max_value=50.0, value=35.0, step=0.5, key="max_temp_input")
-                            min_temp = st.number_input("Min Temp (°C)", min_value=-10.0, max_value=50.0, value=20.0, step=0.5, key="min_temp_input")
-                        
-                        with col3:
-                            st.markdown("**Production & Growth**")
-                            production = st.number_input("Production", min_value=0.0, value=1000.0, step=100.0, key="production_input")
-                            max_humidity = st.slider("Max Humidity (%)", 0, 100, 90, key="max_humidity_input")
-                            min_humidity = st.slider("Min Humidity (%)", 0, 100, 50, key="min_humidity_input")
-                        
-                        st.markdown("**Crop Growth Stages (days)**")
-                        gcol1, gcol2, gcol3 = st.columns(3)
-                        with gcol1:
-                            transplant = st.number_input("Transplant", min_value=0, value=30, step=1, key="transplant_input")
-                        with gcol2:
-                            growth = st.number_input("Growth", min_value=0, value=90, step=1, key="growth_input")
-                        with gcol3:
-                            harvest = st.number_input("Harvest", min_value=0, value=120, step=1, key="harvest_input")
                     
                     st.markdown("---")
                     
@@ -390,7 +392,7 @@ def main():
                                 yaxis_title="Prediction",
                                 height=400
                             )
-                            st.plotly_chart(fig_pred, use_container_width=True, key="pred_comparison_chart")
+                            st.plotly_chart(fig_pred, use_container_width=True, key=f"pred_chart_{iteration}")
                         
                         with viz_cols[1]:
                             # Environmental factors gauge
@@ -413,7 +415,7 @@ def main():
                             ))
                             
                             fig_env.update_layout(height=400)
-                            st.plotly_chart(fig_env, use_container_width=True, key="temperature_gauge_chart")
+                            st.plotly_chart(fig_env, use_container_width=True, key=f"env_gauge_{iteration}")
                         
                         # Feature importance (if available)
                         if hasattr(models["Standard RF"], 'feature_importances_'):
@@ -435,7 +437,7 @@ def main():
                                 title="Top 10 Most Important Features"
                             )
                             fig_imp.update_traces(marker_color='#2E7D32')
-                            st.plotly_chart(fig_imp, use_container_width=True, key="feature_importance_chart")
+                            st.plotly_chart(fig_imp, use_container_width=True, key=f"feature_imp_{iteration}")
                         
                         # Raw data expander
                         with st.expander("📋 View Raw Data"):

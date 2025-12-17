@@ -11,17 +11,17 @@ https://scikit-learn.org/stable/model_persistence.html#security-maintainability-
   warnings.warn(
 /home/hs32/.pyenv/versions/3.11.11/lib/python3.11/site-packages/sklearn/base.py:486: UserWarning: X has feature names, but RandomForestClassifier was fitted without feature names
   warnings.warn(
-2025-12-17 18:13:07.652 Please replace `use_container_width` with `width`.
+2025-12-17 18:26:27.468 Please replace `use_container_width` with `width`.
 
 `use_container_width` will be removed after 2025-12-31.
 
 For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
-2025-12-17 18:13:07.665 Please replace `use_container_width` with `width`.
+2025-12-17 18:26:27.484 Please replace `use_container_width` with `width`.
 
 `use_container_width` will be removed after 2025-12-31.
 
 For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
-2025-12-17 18:13:07.836 Please replace `use_container_width` with `width`.
+2025-12-17 18:26:27.672 Please replace `use_container_width` with `width`.
 
 `use_container_width` will be removed after 2025-12-31.
 
@@ -30,72 +30,246 @@ For `use_container_width=True`, use `width='stretch'`. For `use_container_width=
 
 X has feature names, but RandomForestClassifier was fitted without feature names
 
-2025-12-17 18:13:08.900 Please replace `use_container_width` with `width`.
+2025-12-17 18:26:33.243 Please replace `use_container_width` with `width`.
 
 `use_container_width` will be removed after 2025-12-31.
 
 For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
-2025-12-17 18:13:08.920 Please replace `use_container_width` with `width`.
+2025-12-17 18:26:33.247 Please replace `use_container_width` with `width`.
 
 `use_container_width` will be removed after 2025-12-31.
 
 For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
-2025-12-17 18:13:09.061 Please replace `use_container_width` with `width`.
+2025-12-17 18:26:33.336 Please replace `use_container_width` with `width`.
 
 `use_container_width` will be removed after 2025-12-31.
 
 For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
-2025-12-17 18:13:12.867 Uncaught app execution
-Traceback (most recent call last):
-  File "/home/hs32/.pyenv/versions/3.11.11/lib/python3.11/site-packages/streamlit/runtime/scriptrunner/exec_code.py", line 129, in exec_func_with_error_handling
-    result = func()
-             ^^^^^^
-  File "/home/hs32/.pyenv/versions/3.11.11/lib/python3.11/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 671, in code_to_exec
-    exec(code, module.__dict__)  # noqa: S102
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/hs32/Documents/Projects/adt/prediction/app/app.py", line 459, in <module>
-    main()
-  File "/home/hs32/Documents/Projects/adt/prediction/app/app.py", line 298, in main
-    district = st.selectbox("District", districts, key="district_input")
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/hs32/.pyenv/versions/3.11.11/lib/python3.11/site-packages/streamlit/runtime/metrics_util.py", line 531, in wrapped_func
-    result = non_optional_func(*args, **kwargs)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/hs32/.pyenv/versions/3.11.11/lib/python3.11/site-packages/streamlit/elements/widgets/selectbox.py", line 470, in selectbox
-    return self._selectbox(
-           ^^^^^^^^^^^^^^^^
-  File "/home/hs32/.pyenv/versions/3.11.11/lib/python3.11/site-packages/streamlit/elements/widgets/selectbox.py", line 542, in _selectbox
-    element_id = compute_and_register_element_id(
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/hs32/.pyenv/versions/3.11.11/lib/python3.11/site-packages/streamlit/elements/lib/utils.py", line 265, in compute_and_register_element_id
-    _register_element_id(ctx, element_type, element_id)
-  File "/home/hs32/.pyenv/versions/3.11.11/lib/python3.11/site-packages/streamlit/elements/lib/utils.py", line 145, in _register_element_id
-    raise StreamlitDuplicateElementKey(user_key)
-streamlit.errors.StreamlitDuplicateElementKey: There are multiple elements with the same `key='district_input'`. To fix this, please make sure that the `key` argument is unique for each element you create.
-2025-12-17 18:13:14.094 Uncaught app execution
-Traceback (most recent call last):
-  File "/home/hs32/.pyenv/versions/3.11.11/lib/python3.11/site-packages/streamlit/runtime/scriptrunner/exec_code.py", line 129, in exec_func_with_error_handling
-    result = func()
-             ^^^^^^
-  File "/home/hs32/.pyenv/versions/3.11.11/lib/python3.11/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 671, in code_to_exec
-    exec(code, module.__dict__)  # noqa: S102
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/hs32/Documents/Projects/adt/prediction/app/app.py", line 459, in <module>
-    main()
-  File "/home/hs32/Documents/Projects/adt/prediction/app/app.py", line 298, in main
-    district = st.selectbox("District", districts, key="district_input")
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/hs32/.pyenv/versions/3.11.11/lib/python3.11/site-packages/streamlit/runtime/metrics_util.py", line 531, in wrapped_func
-    result = non_optional_func(*args, **kwargs)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/hs32/.pyenv/versions/3.11.11/lib/python3.11/site-packages/streamlit/elements/widgets/selectbox.py", line 470, in selectbox
-    return self._selectbox(
-           ^^^^^^^^^^^^^^^^
-  File "/home/hs32/.pyenv/versions/3.11.11/lib/python3.11/site-packages/streamlit/elements/widgets/selectbox.py", line 542, in _selectbox
-    element_id = compute_and_register_element_id(
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/hs32/.pyenv/versions/3.11.11/lib/python3.11/site-packages/streamlit/elements/lib/utils.py", line 265, in compute_and_register_element_id
-    _register_element_id(ctx, element_type, element_id)
-  File "/home/hs32/.pyenv/versions/3.11.11/lib/python3.11/site-packages/streamlit/elements/lib/utils.py", line 145, in _register_element_id
-    raise StreamlitDuplicateElementKey(user_key)
-streamlit.errors.StreamlitDuplicateElementKey: There are multiple elements with the same `key='district_input'`. To fix this, please make sure that the `key` argument is unique for each element you create.
+/home/hs32/.pyenv/versions/3.11.11/lib/python3.11/site-packages/sklearn/base.py:486: UserWarning:
+
+X has feature names, but RandomForestClassifier was fitted without feature names
+
+2025-12-17 18:26:43.990 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2025-12-17 18:26:43.997 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2025-12-17 18:26:44.067 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+/home/hs32/.pyenv/versions/3.11.11/lib/python3.11/site-packages/sklearn/base.py:486: UserWarning:
+
+X has feature names, but RandomForestClassifier was fitted without feature names
+
+2025-12-17 18:26:49.711 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2025-12-17 18:26:49.717 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2025-12-17 18:26:49.815 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+/home/hs32/.pyenv/versions/3.11.11/lib/python3.11/site-packages/sklearn/base.py:486: UserWarning:
+
+X has feature names, but RandomForestClassifier was fitted without feature names
+
+2025-12-17 18:26:55.325 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2025-12-17 18:26:55.329 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2025-12-17 18:26:55.422 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+/home/hs32/.pyenv/versions/3.11.11/lib/python3.11/site-packages/sklearn/base.py:486: UserWarning:
+
+X has feature names, but RandomForestClassifier was fitted without feature names
+
+2025-12-17 18:27:01.221 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2025-12-17 18:27:01.226 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2025-12-17 18:27:01.307 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+/home/hs32/.pyenv/versions/3.11.11/lib/python3.11/site-packages/sklearn/base.py:486: UserWarning:
+
+X has feature names, but RandomForestClassifier was fitted without feature names
+
+2025-12-17 18:27:06.738 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2025-12-17 18:27:06.742 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2025-12-17 18:27:06.820 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+/home/hs32/.pyenv/versions/3.11.11/lib/python3.11/site-packages/sklearn/base.py:486: UserWarning:
+
+X has feature names, but RandomForestClassifier was fitted without feature names
+
+2025-12-17 18:27:13.374 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2025-12-17 18:27:13.382 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2025-12-17 18:27:13.462 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+/home/hs32/.pyenv/versions/3.11.11/lib/python3.11/site-packages/sklearn/base.py:486: UserWarning:
+
+X has feature names, but RandomForestClassifier was fitted without feature names
+
+2025-12-17 18:27:19.011 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2025-12-17 18:27:19.015 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2025-12-17 18:27:19.100 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+/home/hs32/.pyenv/versions/3.11.11/lib/python3.11/site-packages/sklearn/base.py:486: UserWarning:
+
+X has feature names, but RandomForestClassifier was fitted without feature names
+
+2025-12-17 18:27:24.639 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2025-12-17 18:27:24.643 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2025-12-17 18:27:24.721 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+/home/hs32/.pyenv/versions/3.11.11/lib/python3.11/site-packages/sklearn/base.py:486: UserWarning:
+
+X has feature names, but RandomForestClassifier was fitted without feature names
+
+2025-12-17 18:27:30.261 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2025-12-17 18:27:30.265 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2025-12-17 18:27:30.351 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+/home/hs32/.pyenv/versions/3.11.11/lib/python3.11/site-packages/sklearn/base.py:486: UserWarning:
+
+X has feature names, but RandomForestClassifier was fitted without feature names
+
+2025-12-17 18:27:40.953 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2025-12-17 18:27:40.957 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2025-12-17 18:27:41.044 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+/home/hs32/.pyenv/versions/3.11.11/lib/python3.11/site-packages/sklearn/base.py:486: UserWarning:
+
+X has feature names, but RandomForestClassifier was fitted without feature names
+
+2025-12-17 18:27:46.550 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2025-12-17 18:27:46.555 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2025-12-17 18:27:46.632 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+/home/hs32/.pyenv/versions/3.11.11/lib/python3.11/site-packages/sklearn/base.py:486: UserWarning:
+
+X has feature names, but RandomForestClassifier was fitted without feature names
+
+2025-12-17 18:27:52.217 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2025-12-17 18:27:52.223 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
+2025-12-17 18:27:52.348 Please replace `use_container_width` with `width`.
+
+`use_container_width` will be removed after 2025-12-31.
+
+For `use_container_width=True`, use `width='stretch'`. For `use_container_width=False`, use `width='content'`.
