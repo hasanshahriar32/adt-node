@@ -349,26 +349,50 @@ def main():
                         features_df = prepare_features(data, user_inputs, config['feature_columns'])
                         features_scaled = encode_and_scale(features_df, encoders, scaler, config['feature_columns'])
                         
-                        # Make predictions
+                        # Make predictions with confidence scores
                         st.subheader("🎯 Crop Yield Predictions")
                         
                         pred_cols = st.columns(len(models))
                         predictions = {}
+                        prediction_probas = {}
                         
                         for idx, (model_name, model) in enumerate(models.items()):
                             with pred_cols[idx]:
                                 prediction = model.predict(features_scaled)[0]
+                                proba = model.predict_proba(features_scaled)[0]
                                 predictions[model_name] = prediction
+                                prediction_probas[model_name] = proba
                                 
                                 # Decode prediction if it's a class label
                                 if 'Crop Name' in encoders:
                                     try:
                                         crop_name = encoders['Crop Name'].inverse_transform([prediction])[0]
-                                        st.metric(model_name, crop_name)
+                                        confidence = proba[prediction] * 100
+                                        st.metric(model_name, crop_name, f"{confidence:.1f}% confidence")
                                     except:
                                         st.metric(model_name, f"Class {prediction}")
                                 else:
                                     st.metric(model_name, f"{prediction:.2f}")
+                        
+                        # Show top 5 predictions for each model
+                        st.markdown("---")
+                        st.subheader("🔝 Top 5 Crop Recommendations (by model)")
+                        
+                        top_pred_cols = st.columns(len(models))
+                        
+                        for idx, (model_name, proba) in enumerate(prediction_probas.items()):
+                            with top_pred_cols[idx]:
+                                st.markdown(f"**{model_name}**")
+                                top_5_indices = np.argsort(proba)[-5:][::-1]
+                                
+                                if 'Crop Name' in encoders:
+                                    for rank, class_idx in enumerate(top_5_indices, 1):
+                                        try:
+                                            crop_name = encoders['Crop Name'].inverse_transform([class_idx])[0]
+                                            confidence = proba[class_idx] * 100
+                                            st.write(f"{rank}. {crop_name}: {confidence:.1f}%")
+                                        except:
+                                            st.write(f"{rank}. Class {class_idx}: {proba[class_idx]*100:.1f}%")
                         
                         st.markdown("---")
                         
@@ -378,24 +402,33 @@ def main():
                         viz_cols = st.columns(2)
                         
                         with viz_cols[0]:
-                            # Prediction comparison chart
-                            fig_pred = go.Figure(data=[
-                                go.Bar(
-                                    x=list(predictions.keys()),
-                                    y=list(predictions.values()),
-                                    marker_color=['#2E7D32', '#388E3C', '#43A047']
-                                )
-                            ])
-                            fig_pred.update_layout(
-                                title="Model Predictions Comparison",
+                            # Confidence comparison across models
+                            fig_conf = go.Figure()
+                            
+                            for model_name, proba in prediction_probas.items():
+                                pred_idx = predictions[model_name]
+                                confidence = proba[pred_idx] * 100
+                                
+                                fig_conf.add_trace(go.Bar(
+                                    x=[model_name],
+                                    y=[confidence],
+                                    name=model_name,
+                                    text=[f"{confidence:.1f}%"],
+                                    textposition='auto',
+                                ))
+                            
+                            fig_conf.update_layout(
+                                title="Model Confidence Comparison",
                                 xaxis_title="Model",
-                                yaxis_title="Prediction",
-                                height=400
+                                yaxis_title="Confidence (%)",
+                                yaxis_range=[0, 100],
+                                height=400,
+                                showlegend=False
                             )
-                            st.plotly_chart(fig_pred, use_container_width=True, key=f"pred_chart_{iteration}")
+                            st.plotly_chart(fig_conf, use_container_width=True, key=f"conf_chart_{iteration}")
                         
                         with viz_cols[1]:
-                            # Environmental factors gauge
+                            # Environmental factors gauge - Temperature
                             fig_env = go.Figure()
                             
                             fig_env.add_trace(go.Indicator(
@@ -410,12 +443,130 @@ def main():
                                         {'range': [0, 20], 'color': "lightblue"},
                                         {'range': [20, 35], 'color': "lightgreen"},
                                         {'range': [35, 50], 'color': "lightyellow"}
-                                    ]
+                                    ],
+                                    'threshold': {
+                                        'line': {'color': "red", 'width': 4},
+                                        'thickness': 0.75,
+                                        'value': 40
+                                    }
                                 }
                             ))
                             
                             fig_env.update_layout(height=400)
                             st.plotly_chart(fig_env, use_container_width=True, key=f"env_gauge_{iteration}")
+                        
+                        # Additional environmental gauges
+                        env_cols = st.columns(3)
+                        
+                        with env_cols[0]:
+                            # Humidity gauge
+                            fig_hum = go.Figure(go.Indicator(
+                                mode="gauge+number+delta",
+                                value=tel.get('humidity', 0) if 'telemetry' in data else 0,
+                                delta={'reference': 60},
+                                title={'text': "Humidity (%)"},
+                                gauge={
+                                    'axis': {'range': [None, 100]},
+                                    'bar': {'color': "#2196F3"},
+                                    'steps': [
+                                        {'range': [0, 40], 'color': "lightyellow"},
+                                        {'range': [40, 70], 'color': "lightgreen"},
+                                        {'range': [70, 100], 'color': "lightblue"}
+                                    ]
+                                }
+                            ))
+                            fig_hum.update_layout(height=300)
+                            st.plotly_chart(fig_hum, use_container_width=True, key=f"hum_gauge_{iteration}")
+                        
+                        with env_cols[1]:
+                            # Soil Moisture gauge
+                            fig_soil = go.Figure(go.Indicator(
+                                mode="gauge+number+delta",
+                                value=tel.get('soilMoisture', 0) if 'telemetry' in data else 0,
+                                delta={'reference': 50},
+                                title={'text': "Soil Moisture (%)"},
+                                gauge={
+                                    'axis': {'range': [None, 100]},
+                                    'bar': {'color': "#8D6E63"},
+                                    'steps': [
+                                        {'range': [0, 30], 'color': "#FFCCBC"},
+                                        {'range': [30, 60], 'color': "#A1887F"},
+                                        {'range': [60, 100], 'color': "#6D4C41"}
+                                    ]
+                                }
+                            ))
+                            fig_soil.update_layout(height=300)
+                            st.plotly_chart(fig_soil, use_container_width=True, key=f"soil_gauge_{iteration}")
+                        
+                        with env_cols[2]:
+                            # Prediction agreement indicator
+                            unique_preds = len(set(predictions.values()))
+                            agreement = ((len(predictions) - unique_preds + 1) / len(predictions)) * 100
+                            
+                            fig_agree = go.Figure(go.Indicator(
+                                mode="gauge+number",
+                                value=agreement,
+                                title={'text': "Model Agreement (%)"},
+                                gauge={
+                                    'axis': {'range': [None, 100]},
+                                    'bar': {'color': "#4CAF50"},
+                                    'steps': [
+                                        {'range': [0, 50], 'color': "#FFCDD2"},
+                                        {'range': [50, 75], 'color': "#FFF9C4"},
+                                        {'range': [75, 100], 'color': "#C8E6C9"}
+                                    ]
+                                }
+                            ))
+                            fig_agree.update_layout(height=300)
+                            st.plotly_chart(fig_agree, use_container_width=True, key=f"agree_gauge_{iteration}")
+                        
+                        # Prediction probability distribution for primary model
+                        st.markdown("---")
+                        st.subheader("📈 Prediction Probability Distribution (Standard RF)")
+                        
+                        primary_model = "Standard RF"
+                        if primary_model in prediction_probas:
+                            proba = prediction_probas[primary_model]
+                            top_10_indices = np.argsort(proba)[-10:][::-1]
+                            
+                            crop_names = []
+                            confidences = []
+                            
+                            if 'Crop Name' in encoders:
+                                for idx in top_10_indices:
+                                    try:
+                                        crop_name = encoders['Crop Name'].inverse_transform([idx])[0]
+                                        crop_names.append(crop_name)
+                                        confidences.append(proba[idx] * 100)
+                                    except:
+                                        crop_names.append(f"Class {idx}")
+                                        confidences.append(proba[idx] * 100)
+                            
+                                fig_dist = go.Figure(data=[
+                                    go.Bar(
+                                        x=confidences,
+                                        y=crop_names,
+                                        orientation='h',
+                                        marker=dict(
+                                            color=confidences,
+                                            colorscale='Greens',
+                                            showscale=True,
+                                            colorbar=dict(title="Confidence %")
+                                        ),
+                                        text=[f"{c:.1f}%" for c in confidences],
+                                        textposition='auto'
+                                    )
+                                ])
+                                
+                                fig_dist.update_layout(
+                                    title="Top 10 Crop Predictions by Confidence",
+                                    xaxis_title="Confidence (%)",
+                                    yaxis_title="Crop Name",
+                                    height=400,
+                                    yaxis={'categoryorder': 'total ascending'}
+                                )
+                                
+                                st.plotly_chart(fig_dist, use_container_width=True, key=f"dist_chart_{iteration}")
                         
                         # Feature importance (if available)
                         if hasattr(models["Standard RF"], 'feature_importances_'):
