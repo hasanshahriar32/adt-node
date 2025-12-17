@@ -4,10 +4,11 @@
 
 ### 🔥 Real-Time Simulation
 - **Status**: ✅ **ACTIVE**
-- **PID**: `cat /home/hs32/Documents/Projects/adt/azure-setup/live-sim.pid`
-- **Updates**: Every 5 seconds
+- **Process**: Node-RED simulation (PID: check with `ps aux | grep node-red`)
+- **Updates**: Every ~60 seconds via IoT Hub → Event Grid → Azure Function
 - **Twin**: `zone_A` in `farm-digital-twin`
 - **Data**: Temperature, Humidity, Soil Moisture
+- **Pipeline**: Node-RED → IoT Hub → Event Grid → Function → Digital Twin
 
 ### 📊 VIEW YOUR LIVE DATA NOW!
 
@@ -33,15 +34,16 @@
 
 3. **Show Live Data**
    - Properties panel shows:
-     - `temperature`: Currently updating
-     - `humidity`: Currently updating
-     - `soilMoisture`: Currently updating
-   - **Click refresh** → Values change!
+     - `temperature`: Currently 27.0°C (updating every ~60s)
+     - `humidity`: Currently 72.0% (updating every ~60s)
+     - `soilMoisture`: Currently 63.0% (updating every ~60s)
+   - **Wait 60 seconds and refresh** → Values change!
 
 4. **Explain**:
-   - "These are live sensor readings from our simulation"
-   - "Data updates every 5 seconds"
-   - "Perfect for real-time farm monitoring"
+   - "These are live sensor readings flowing through Azure IoT Hub"
+   - "Event Grid routes telemetry to Azure Functions"
+   - "Functions update the Digital Twin in real-time"
+   - "Perfect for real-time farm monitoring and analytics"
 
 ---
 

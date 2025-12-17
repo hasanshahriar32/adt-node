@@ -2,9 +2,10 @@
 
 ## 🎉 SYSTEM FULLY OPERATIONAL
 
-**Last Verified**: 2025-12-17 07:06:55 UTC  
+**Last Verified**: 2025-12-17 07:35:53 UTC  
 **Data Pipeline**: ✅ Working end-to-end  
-**Azure Digital Twins Explorer**: ✅ Showing real-time data
+**Azure Digital Twins Explorer**: ✅ Showing real-time data (60s updates)
+**Event Grid**: ✅ Connected and delivering events
 
 ---
 
@@ -64,10 +65,11 @@ cd /home/hs32/Documents/Projects/adt/azure-setup
 - pc_sim_01 (Device twin - receiving updates ✅)
 
 **Last Update**:
-- Temperature: 25.5°C
-- Humidity: 70.5%
-- Soil Moisture: 61.5%
-- Timestamp: 2025-12-17T07:06:55.552+00:00
+- Temperature: 27.0°C
+- Humidity: 72.0%
+- Soil Moisture: 63.0%
+- Timestamp: 2025-12-17T07:35:53.585Z
+- **Update Frequency**: Every ~60 seconds (real-time)
 
 **Quick Check**:
 ```bash
@@ -113,15 +115,20 @@ cd /home/hs32/Documents/Projects/adt/azure-setup
 
 ### 5. Event Grid
 - **Provider**: ✅ Registered (Microsoft.EventGrid)
-- **System Topic**: adt-sys
-- **Subscription**: ✅ iot-to-adt-subscription (Active)
+- **System Topic**: adt-sys (in DT_Research)
+- **Subscription**: ✅ iothub-to-adt-function (Active)
 - **Status**: ✅ Delivering events successfully
+- **Provisioning State**: Succeeded
 
 **Subscription Details**:
-- **Source**: IoT Hub (researchdt)
+- **Name**: iothub-to-adt-function
+- **Source**: IoT Hub System Topic (adt-sys)
 - **Destination**: Azure Function (IoTHub_EventGrid)
-- **Event Type**: Device Telemetry
-- **Created**: Manually via Azure Portal (CLI authentication issues)
+- **Event Type**: Microsoft.Devices.DeviceTelemetry
+- **Event Schema**: EventGridSchema
+- **Max Events Per Batch**: 1
+- **Retry Policy**: 30 attempts, 1440 minutes TTL
+- **Created**: 2025-12-17 via Azure CLI
 
 **Quick Check**:
 ```bash

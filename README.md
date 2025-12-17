@@ -2,6 +2,15 @@
 
 This project implements a complete IoT solution using Azure Digital Twins, Azure IoT Hub, and Node-RED for simulation.
 
+## ✅ Current Status: FULLY OPERATIONAL
+
+**Live Data Pipeline**: Node-RED → IoT Hub → Event Grid → Azure Function → Digital Twin  
+**Last Verified**: December 17, 2025  
+**Update Frequency**: ~60 seconds
+
+📊 **View Live Data**: [Azure Digital Twins Explorer](https://explorer.digitaltwins.azure.net)  
+📖 **Full Status**: See [SYSTEM_STATUS.md](./SYSTEM_STATUS.md)
+
 ## 🚀 Project Progress
 
 | Phase | Description | Status | Location |
@@ -10,8 +19,9 @@ This project implements a complete IoT solution using Azure Digital Twins, Azure
 | **Phase 2** | **Data Contract Definition** - JSON schema for telemetry and heartbeat. | ✅ **Completed** | `simulation/flows.json` |
 | **Phase 3** | **Azure IoT Hub Connectivity** - MQTT connection to cloud. | ✅ **Completed** | `simulation/` |
 | **Phase 3.5** | **Weather-Driven Simulation** - Real external data (OpenWeatherMap API) fused with physics-based soil model. | ✅ **Completed** | `simulation/` |
-| **Phase 4** | **Digital Twins Modeling** - DTDL models for Farm, Zone, Sensor. | ⏳ *Pending* | `digital-twins/` |
-| **Phase 5** | **Azure Functions** - Serverless compute to update Twins. | ⏳ *Pending* | `azure-functions/` |
+| **Phase 4** | **Digital Twins Modeling** - DTDL models for Zone, Device with Properties. | ✅ **Completed** | `digital-twins/` |
+| **Phase 5** | **Azure Functions** - Event Grid triggered function updating Twins. | ✅ **Completed** | `azure-functions/` |
+| **Phase 6** | **Event Grid Integration** - IoT Hub → Event Grid → Function → Twin. | ✅ **Completed** | Azure Portal |
 
 ## 📂 Project Structure
 
@@ -44,9 +54,12 @@ Will contain the **DTDL (Digital Twins Definition Language)** models.
 
 ### 4. `azure-functions/`
 
-Will contain the **Azure Functions** code (likely Python or JavaScript).
+Contains the **Azure Functions** code (Python 3.11) deployed to Azure.
 
-- **Purpose**: Ingests data from IoT Hub and updates the Digital Twins graph.
+- **Function**: `IoTHub_EventGrid` - Event Grid triggered function
+- **Purpose**: Receives telemetry from IoT Hub via Event Grid and updates Digital Twin properties
+- **Status**: ✅ Deployed and running (adt-telemetry-router)
+- **Trigger**: Event Grid (Microsoft.Devices.DeviceTelemetry events)
 
 ## 🛠️ Getting Started
 
