@@ -21,6 +21,8 @@ WORKDIR /usr/src/app/client/src
 RUN npm install
 # Fix postcss compatibility issue
 RUN npm install postcss@^8.4.31 --save-dev --legacy-peer-deps
+# Fix cytoscape compatibility
+RUN npm install cytoscape@^3.23.0 --save --legacy-peer-deps
 
 # Bundle app source
 WORKDIR /usr/src/app
