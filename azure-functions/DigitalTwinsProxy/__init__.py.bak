@@ -1,0 +1,118 @@
+"""
+Azure Function: Digital Twins API Pass-Through Proxy
+Acts as a transparent proxy for Azure Digital Twins REST API
+No authentication required - uses Managed Identity internally
+"""
+
+import azure.functions as func
+import json
+import os
+import logging
+import urllib.parse
+import requests
+from azure.identity import DefaultAzureCredential
+
+# Initialize credentials
+ADT_URL = os.environ.get("ADT_INSTANCE_URL", "https://farm-digital-twin.api.sea.digitaltwins.azure.net")
+credential = DefaultAzureCredential()
+token_cache = {"token": None, "expires_on": 0}
+
+def get_adt_token():
+    """Get or refresh Azure Digital Twins access token"""
+    import time
+    
+    # Check if token is still valid (with 5 min buffer)
+    if token_cache["token"] and token_cache["expires_on"] > time.time() + 300:
+        return token_cache["token"]
+    
+    # Get new token
+    token_obj = credential.get_token("https://digitaltwins.azure.net/.default")
+    token_cache["token"] = token_obj.token
+    token_cache["expires_on"] = token_obj.expires_on
+    
+    logging.info(f"Retrieved new ADT token, expires at {token_obj.expires_on}")
+    return token_obj.token
+
+
+def main(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Pass-through proxy for Azure Digital Twins REST API
+    Forwards all requests to ADT with proper authentication
+    """
+    
+    logging.info(f'DigitalTwinsProxy: {req.method} {req.url}')
+    
+    # CORS headers for all responses
+    cors_headers = {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, x-adt-host",
+        "Cache-Control": "no-cache"
+    }
+    
+    # Handle OPTIONS preflight request
+    if req.method == "OPTIONS":
+        return func.HttpResponse("", status_code=200, headers=cors_headers)
+    
+    try:
+        # Get the path after /api/dt
+        route_params = req.route_params.get('route', '')
+        
+        # Build the full ADT URL
+        adt_path = f"/{route_params}" if route_params else "/"
+        
+        # Preserve query parameters
+        query_string = req.url.split('?', 1)[1] if '?' in req.url else ''
+        
+        target_url = f"{ADT_URL}{adt_path}"
+        if query_string:
+            target_url = f"{target_url}?{query_string}"
+        
+        logging.info(f"Proxying to: {target_url}")
+        
+        # Get authentication token
+        token = get_adt_token()
+        
+        # Prepare headers
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json"
+        }
+        
+        # Get request body if present
+        body = None
+        if req.method in ["POST", "PUT", "PATCH"]:
+            try:
+                body = req.get_body()
+            except:
+                pass
+        
+        # Forward the request to ADT
+        response = requests.request(
+            method=req.method,
+            url=target_url,
+            headers=headers,
+            data=body,
+            timeout=30
+        )
+        
+        # Return the response
+        return func.HttpResponse(
+            response.content,
+            status_code=response.status_code,
+            mimetype="application/json",
+            headers=cors_headers
+        )
+        
+    except Exception as e:
+        logging.error(f"Proxy error: {str(e)}", exc_info=True)
+        return func.HttpResponse(
+            json.dumps({
+                "error": "Proxy operation failed",
+                "message": str(e)
+            }),
+            status_code=500,
+            mimetype="application/json",
+            headers=cors_headers
+        )
+

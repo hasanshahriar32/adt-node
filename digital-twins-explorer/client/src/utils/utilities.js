@@ -30,8 +30,11 @@ export function readFile(file) {
 export function sortArray(array, ...propertyNames) {
   array.sort((a, b) => {
     for (const p of propertyNames) {
-      const pA = a[p].toUpperCase();
-      const pB = b[p].toUpperCase();
+      // Handle undefined or null values
+      const valA = a[p] || '';
+      const valB = b[p] || '';
+      const pA = String(valA).toUpperCase();
+      const pB = String(valB).toUpperCase();
       if (pA < pB) {
         return -1;
       }

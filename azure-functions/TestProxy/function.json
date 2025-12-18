@@ -9,12 +9,9 @@
       "methods": [
         "get",
         "post",
-        "put",
-        "patch",
-        "delete",
         "options"
       ],
-      "route": "dt/{*route}"
+      "route": "test"
     },
     {
       "type": "http",

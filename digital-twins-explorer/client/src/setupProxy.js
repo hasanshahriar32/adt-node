@@ -1,67 +1,46 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-/* This code is used for local development purposes only
-Library consumers are responsible for creating server side middleware
-as necessary and appropriate for their scenarios */
+/* Modified to use Azure Function Proxy for public access
+   No authentication required - the Azure Function handles auth via Managed Identity */
 
-const { DefaultAzureCredential } = require("@azure/identity");
 const { createProxyMiddleware } = require("http-proxy-middleware");
 
+// Azure Function Proxy endpoint
+const AZURE_FUNCTION_PROXY = "https://adt-telemetry-router.azurewebsites.net";
+
 module.exports = function (app) {
-  // Client identity should always be verified in hosted implementations
-  // DefaultAzureCredential is used for local development purposes only
-  const credentialDigitalTwins = new DefaultAzureCredential();
-  const credentialRBAC = new DefaultAzureCredential();
-  const credentialGraph = new DefaultAzureCredential();
-  let tokenDigitalTwins = null;
-  let tokenRBAC = null;
-  let tokenGraph = null;
-
-  const tokenSetRefresh = async (trToken, trCredential, trContext) => {
-    let tmpTrToken = trToken;
-    if (!tmpTrToken || tmpTrToken.expiresOnTimestamp < Date.now()) {
-      tmpTrToken = await trCredential.getToken(trContext);
-    }
-    return tmpTrToken;
-  };
-
-  const pathRewrite = async (path, req) => {
-    let destinationPath = null;
-    let requestToken = null;
-    if (path.startsWith("/api/proxy/RBAC")) {
-      destinationPath = "/api/proxy/RBAC";
-      tokenRBAC = await tokenSetRefresh(tokenRBAC, credentialRBAC, "https://management.azure.com/.default");
-      requestToken = tokenRBAC;
-    } else if (path.startsWith("/api/proxy/Graph")) {
-      destinationPath = "/api/proxy/Graph";
-      tokenGraph = await tokenSetRefresh(tokenGraph, credentialGraph, "https://graph.microsoft.com/.default");
-      requestToken = tokenGraph;
-    } else {
-      destinationPath = "/api/proxy";
-      tokenDigitalTwins = await tokenSetRefresh(tokenDigitalTwins, credentialDigitalTwins, "https://digitaltwins.azure.net/.default");
-      requestToken = tokenDigitalTwins;
-    }
-    req.headers.authorization = `Bearer ${requestToken.token}`;
-    return path.replace(destinationPath, "");
-  };
-
+  // Simple proxy that forwards all requests to the Azure Function Proxy
+  // The Azure Function handles authentication and communicates with Azure Digital Twins
+  
   app.use(
     "/api/proxy",
     createProxyMiddleware({
+      target: AZURE_FUNCTION_PROXY,
       changeOrigin: true,
-      headers: {
-        connection: "keep-alive"
+      pathRewrite: (path, req) => {
+        // Remove /api/proxy prefix and forward to /api/dt
+        const newPath = path.replace("/api/proxy", "/api/dt");
+        console.log(`Proxying: ${path} -> ${newPath}`);
+        return newPath;
       },
-      target: "/",
-      onProxyReq: proxyReq => {
+      onProxyReq: (proxyReq, req, res) => {
+        // Remove origin headers that might cause CORS issues
         if (proxyReq.getHeader("origin")) {
           proxyReq.removeHeader("origin");
           proxyReq.removeHeader("referer");
         }
+        
+        // Extract ADT host from x-adt-host header (set by CustomHttpClient in ApiService.js)
+        const adtHost = req.headers["x-adt-host"];
+        if (adtHost) {
+          console.log(`Request for ADT host: ${adtHost}`);
+        }
       },
-      pathRewrite,
-      router: req => `https://${req.headers["x-adt-host"]}/`
+      onError: (err, req, res) => {
+        console.error("Proxy error:", err);
+        res.status(500).json({ error: "Proxy error", message: err.message });
+      }
     })
   );
 };
