@@ -26,6 +26,15 @@ class ConfigService {
       return Promise.resolve(this._config);
     }
 
+    // Check for environment variable first
+    if (process.env.REACT_APP_ADT_URL) {
+      const envConfig = {
+        appAdtUrl: process.env.REACT_APP_ADT_URL
+      };
+      this._config = envConfig;
+      return Promise.resolve(envConfig);
+    }
+
     const localStorageConfig = storageService.getLocalStorageObject(StorageKeyName);
     if (localStorageConfig) {
       return Promise.resolve(localStorageConfig);

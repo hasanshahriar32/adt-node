@@ -15,6 +15,8 @@ COPY . .
 # Build the app
 ENV DISABLE_ESLINT_PLUGIN=true
 ENV NODE_OPTIONS="--max-old-space-size=4096"
+ARG REACT_APP_ADT_URL
+ENV REACT_APP_ADT_URL=$REACT_APP_ADT_URL
 RUN npm run build
 
 # Install serve to run the production build
