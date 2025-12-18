@@ -60,10 +60,45 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             # Get query parameters
             include_definition = req.params.get('includeModelDefinition', 'false').lower() == 'true'
             
-            models = list(dt_client.list_models(include_model_definition=include_definition))
-            logging.info(f"Found {len(models)} models")
+            models_raw = list(dt_client.list_models(include_model_definition=include_definition))
+            logging.info(f"Found {len(models_raw)} models")
+            
+            # Convert models to proper JSON format using as_dict()
+            models = []
+            for model in models_raw:
+                # Use as_dict() to get proper dict representation
+                model_dict = model.as_dict() if hasattr(model, 'as_dict') else {}
+                
+                # Convert datetime to ISO string
+                if 'upload_time' in model_dict and model_dict['upload_time']:
+                    model_dict['uploadTime'] = model_dict['upload_time'].isoformat()
+                    del model_dict['upload_time']
+                
+                # Handle display_name (can be dict with language codes like {'en': 'Farm'})
+                if 'display_name' in model_dict:
+                    dn = model_dict['display_name']
+                    if isinstance(dn, dict):
+                        model_dict['displayName'] = dn.get('en') or (list(dn.values())[0] if dn else '')
+                    else:
+                        model_dict['displayName'] = str(dn) if dn else ''
+                    del model_dict['display_name']
+                
+                # Handle description (can be dict with language codes)
+                if 'description' in model_dict:
+                    desc = model_dict['description']
+                    if isinstance(desc, dict):
+                        model_dict['description'] = desc.get('en') or (list(desc.values())[0] if desc else '')
+                    elif desc:
+                        model_dict['description'] = str(desc)
+                
+                # Remove additional_properties if empty
+                if 'additional_properties' in model_dict and not model_dict['additional_properties']:
+                    del model_dict['additional_properties']
+                
+                models.append(model_dict)
+            
             return func.HttpResponse(
-                json.dumps({"value": models}, default=str),
+                json.dumps({"value": models}),
                 status_code=200,
                 mimetype="application/json",
                 headers=cors_headers
