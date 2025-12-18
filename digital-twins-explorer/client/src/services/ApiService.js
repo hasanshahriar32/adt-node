@@ -49,7 +49,7 @@ class CustomHttpClient {
     this.client = new DefaultHttpClient();
   }
 
-  sendRequest(httpRequest) {
+  async sendRequest(httpRequest) {
     const url = new URL(httpRequest.url);
     url.searchParams.set("api-version", API_VERSION);
     httpRequest.headers.set("x-adt-host", url.hostname);
@@ -60,7 +60,65 @@ class CustomHttpClient {
     url.protocol = baseUrl.protocol;
     httpRequest.url = url.toString();
 
-    return this.client.sendRequest(httpRequest);
+    const response = await this.client.sendRequest(httpRequest);
+    
+    // Fix for Python string responses from Azure Function
+    if (response.bodyAsText && typeof response.bodyAsText === 'string') {
+      try {
+        const parsed = JSON.parse(response.bodyAsText);
+        if (parsed.value && Array.isArray(parsed.value)) {
+          // Check if items are Python string representations
+          if (parsed.value.length > 0 && typeof parsed.value[0] === 'string' && parsed.value[0].includes("'id':")) {
+            // Convert Python dict strings to JSON
+            parsed.value = parsed.value.map(item => {
+              if (typeof item === 'string') {
+                // Replace Python datetime objects and single quotes
+                let cleaned = item
+                  .replace(/datetime\.datetime\([^)]+\)/g, 'null')
+                  .replace(/<FixedOffset[^>]+>/g, '')
+                  .replace(/'/g, '"')
+                  .replace(/None/g, 'null')
+                  .replace(/True/g, 'true')
+                  .replace(/False/g, 'false');
+                
+                try {
+                  const obj = JSON.parse(cleaned);
+                  // Extract displayName from language dict
+                  if (obj.display_name && typeof obj.display_name === 'object') {
+                    obj.displayName = obj.display_name.en || Object.values(obj.display_name)[0] || '';
+                    delete obj.display_name;
+                  }
+                  // Extract description from language dict
+                  if (obj.description && typeof obj.description === 'object') {
+                    obj.description = obj.description.en || Object.values(obj.description)[0] || '';
+                  }
+                  // Convert upload_time to uploadTime
+                  if (obj.upload_time) {
+                    obj.uploadTime = obj.upload_time;
+                    delete obj.upload_time;
+                  }
+                  // Remove empty additional_properties
+                  if (obj.additional_properties && Object.keys(obj.additional_properties).length === 0) {
+                    delete obj.additional_properties;
+                  }
+                  return obj;
+                } catch (e) {
+                  console.error('Failed to parse Python string:', item, e);
+                  return item;
+                }
+              }
+              return item;
+            });
+            response.bodyAsText = JSON.stringify(parsed);
+            response.parsedBody = parsed;
+          }
+        }
+      } catch (e) {
+        console.error('Error processing response:', e);
+      }
+    }
+    
+    return response;
   }
 
 }
